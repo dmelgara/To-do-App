@@ -1,8 +1,7 @@
-let tasks =[];
+let tasks = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('taskForm');
-    const taskTableBody = document.getElementById('taskBody');
     const tasksList = document.getElementById('tasklist');
 
     const addTask = () => {
@@ -18,13 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         taskInput.value = ''; // Clear input field after adding task
-
-        
     };
 
-
     const toggleTaskComplete = (index) => {
-       tasks[index].completed = !tasks[index].completed;
+        tasks[index].completed = !tasks[index].completed;
+        updateTasksList();
     };
 
     const editTask = (index) => {
@@ -39,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tasks.splice(index, 1);
         updateTasksList();
     };
-  
+
     const updateProgress = () => {
         const completedTasks = tasks.filter(task => task.completed).length;
         const totalTasks = tasks.length;
@@ -48,16 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('progress').style.width = `${progress}%`;
         document.getElementById('numbers').innerText = `${completedTasks} / ${totalTasks}`;
 
-        if (completedTasks == totalTasks) {
+        if (completedTasks > 0 && completedTasks === totalTasks) {
             Confetti();
         }
-
-        if (totalTasks > 0 && completedTasks === totalTasks) {
-            Confetti();
-        }
-
     };
-
 
     const updateTasksList = () => {
         tasksList.innerHTML = '';
@@ -65,36 +56,34 @@ document.addEventListener('DOMContentLoaded', () => {
             const taskElement = document.createElement('li');
             taskElement.innerHTML = `
                 <div class="taskItem">
-                <div class="task ${task.completed ? 'completed' : ''}">
-                    <input type="checkbox" class="taskCheckbox" ${task.completed ? "checked" : ""}>
-                    <span>${task.text}</span>
+                    <div class="task ${task.completed ? 'completed' : ''}">
+                        <input type="checkbox" class="taskCheckbox" ${task.completed ? "checked" : ""}>
+                        <span>${task.text}</span>
+                    </div>
+                    <div class="taskIcons">
+                        <i class="bi bi-eraser-fill deleteTask"></i>
+                        <i class="bi bi-pencil editTask"></i>
+                    </div>
                 </div>
-                <div class="taskIcons">
-                    <i class="bi bi-eraser-fill" onClick="editTask(${index})"></i>
-                    <i class="bi bi-pencil" onClick="deleteTask(${index})"></i>
-                </div>
-            </div>
-            `; 
-
-            taskElement.querySelector('.taskItem').addEventListener('click', () => {
-                toggleTaskComplete(index);
-                updateTasksList(); // Update the task list UI immediately
-            });
+            `;
             
-        
+            // Ensure only checkbox toggles task completion
+            taskElement.querySelector(".taskItem").addEventListener("click", () => {
+                toggleTaskComplete(index);
+            });
 
-        //Edit task
-        taskElement.querySelector('i.bi.bi-pencil').addEventListener('click', () => {
-            editTask(index);
+            // edit event
+            taskElement.querySelector(".editTask").addEventListener("click", () => {
+                editTask(index);
+            });
+
+            // delete event
+            taskElement.querySelector(".deleteTask").addEventListener("click", () => {
+                deleteTask(index);
+            });
+
+            tasksList.appendChild(taskElement);
         });
-
-        //Delete task
-        taskElement.querySelector('i.bi.bi-eraser-fill').addEventListener('click', () => {
-            deleteTask(index);
-        });
-
-        tasksList.appendChild(taskElement);
-    });
 
         updateProgress();
     };
@@ -105,14 +94,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Confetti Effect
 const jsConfetti = new JSConfetti();
 
 const Confetti = () => {
     jsConfetti.addConfetti({
-        emojis: ['🎉', '✨', '🎈'], // Optional: Add fun emojis
-        confettiColors: ['#ff0a54', '#ff477e', '#ff7096', '#ff85a1'], 
+        emojis: ['🎉', '✨', '🎈'],
+        confettiColors: ['#ff0a54', '#ff477e', '#ff7096', '#ff85a1'],
         emojiSize: 50,
         confettiNumber: 150
-        
     });
 };
